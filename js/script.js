@@ -149,7 +149,7 @@ function updateBottomTabs(id) {
   if (indicator) indicator.style.transform = `translateX(${index * 100}%)`;
 
   document.querySelectorAll('.nav-links a:not(.nav-cta)').forEach(a => a.classList.remove('nav-active'));
-  const pageMap = { home: 0, about: 1, blog: 2, therapy: 3 };
+  const pageMap = { home: 0, about: 1, blog: 2, donation: 3, therapy: 4 };
   if (id in pageMap) {
     const navLinks = document.querySelectorAll('.nav-links a:not(.nav-cta)');
     if (navLinks[pageMap[id]]) navLinks[pageMap[id]].classList.add('nav-active');
