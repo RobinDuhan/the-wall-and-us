@@ -315,11 +315,6 @@ body{
     /* Critical: must be visible and not clipped */
     min-height: 100vh;
   }
-  #donation.active {
-    padding: 7rem 2rem 2rem;
-    color: var(--charcoal);
-    font-size: 1.25rem;
-  }
   section.page-enter {
     animation: pageEnter 0.35s ease both;
   }
