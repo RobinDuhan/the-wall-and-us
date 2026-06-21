@@ -149,7 +149,7 @@ function updateBottomTabs(id) {
   if (indicator) indicator.style.transform = `translateX(${index * 100}%)`;
 
   document.querySelectorAll('.nav-links a:not(.nav-cta)').forEach(a => a.classList.remove('nav-active'));
-  const pageMap = { home: 0, about: 1, blog: 2, therapy: 3 };
+  const pageMap = { home: 0, about: 1, blog: 2, share: 3, therapy: 4 };
   if (id in pageMap) {
     const navLinks = document.querySelectorAll('.nav-links a:not(.nav-cta)');
     if (navLinks[pageMap[id]]) navLinks[pageMap[id]].classList.add('nav-active');
@@ -592,6 +592,88 @@ function initCtaParticles() {
   });
 }
 
+/* ══════════ SHARE YOUR EXPERIENCE — FORM SUBMISSION ══════════ */
+
+// 1) Deploy the Google Apps Script web app (see the README the deployment guide gave you).
+// 2) Paste the resulting "Web app URL" below, between the quotes.
+// 3) That's it — submissions will start landing as new rows in your Google Sheet.
+const SHARE_FORM_ENDPOINT = "https://script.google.com/macros/s/AKfycbwnuNJRIpDkc5wOzpQhdxM6OYrXwSgHYOPtduAXWI7uDq0iLPJwZDbKW6gGEYXXi6QD/exec";
+
+function initShareForm() {
+  const form = document.getElementById('shareForm');
+  if (!form) return;
+
+  const submitBtn = document.getElementById('shareSubmitBtn');
+  const submitLabel = document.getElementById('shareSubmitLabel');
+  const statusBox = document.getElementById('shareFormStatus');
+
+  function setStatus(message, type) {
+    statusBox.textContent = message;
+    statusBox.className = 'form-status visible ' + type;
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const story = document.getElementById('shareStory').value.trim();
+    if (!story) {
+      setStatus('Please share at least a few words before submitting.', 'error');
+      document.getElementById('shareStory').focus();
+      return;
+    }
+
+    // Honeypot check — if this hidden field has a value, a bot filled the form. Quietly stop.
+    const honeypot = document.getElementById('shareWebsite');
+    if (honeypot && honeypot.value) {
+      setStatus("Thank you for sharing. We've received your story.", 'success');
+      form.reset();
+      return;
+    }
+
+    if (!SHARE_FORM_ENDPOINT || SHARE_FORM_ENDPOINT.indexOf('PASTE_YOUR') === 0) {
+      setStatus('This form is not connected to a Google Sheet yet. Please follow the setup steps to add your Apps Script URL.', 'error');
+      return;
+    }
+
+    const payload = new URLSearchParams({
+      name: document.getElementById('shareName').value.trim(),
+      email: document.getElementById('shareEmail').value.trim(),
+      story: story,
+      consent: document.getElementById('shareConsent').checked ? 'Yes' : 'No',
+      submittedAt: new Date().toISOString(),
+      pageUrl: window.location.href
+    });
+
+    submitBtn.disabled = true;
+    submitLabel.textContent = 'Sending…';
+    statusBox.className = 'form-status';
+
+    fetch(SHARE_FORM_ENDPOINT, {
+      method: 'POST',
+      // Sending the URLSearchParams object directly (not .toString()) lets the browser set
+      // Content-Type: application/x-www-form-urlencoded automatically. This avoids a CORS
+      // preflight request AND lets Apps Script correctly populate e.parameter on the other end.
+      body: payload
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.result === 'success') {
+          setStatus("Thank you for trusting us with your story. We've received it. 💛", 'success');
+          form.reset();
+        } else {
+          throw new Error((data && data.message) || 'Unknown error');
+        }
+      })
+      .catch(() => {
+        setStatus("Something went wrong sending your story. Please try again, or reach out via Talk to Us.", 'error');
+      })
+      .finally(() => {
+        submitBtn.disabled = false;
+        submitLabel.textContent = 'Share My Story';
+      });
+  });
+}
+
 // Global execution wrapper on initial layout load
 document.addEventListener("DOMContentLoaded", () => {
   updateBottomTabs('home');
@@ -603,6 +685,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initHeroWordReveal();
   initHeroParallax();
   initCtaParticles();
+  initShareForm();
   observeReveal();
 });
 

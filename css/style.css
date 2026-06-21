@@ -902,6 +902,63 @@ body{
     line-height: 1.7;
   }
 
+  /* ══════════ SHARE YOUR EXPERIENCE ══════════ */
+  .share-hero {
+    background: var(--cream); padding: 9rem 5% 1rem; text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .share-hero::before {
+    content: ''; position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 60% at 50% 30%, rgba(196,96,58,0.07) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 80% 80%, rgba(122,158,135,0.07) 0%, transparent 60%);
+  }
+  .share-hero > * { position: relative; z-index: 2; }
+  .share-hero .section-label { text-align: center; }
+  .share-hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(2.1rem,4.5vw,3.4rem); color: var(--charcoal); margin-bottom: 1.1rem; }
+  .share-hero h1 em { color: var(--terracotta); font-style: italic; }
+  .share-hero p { font-size: 1.02rem; line-height: 1.85; color: var(--charcoal-soft); max-width: 600px; margin: 0 auto; }
+
+  .share-form-section { padding: 2.2rem 5% 6rem; background: var(--cream); }
+  .share-form-wrap { max-width: 640px; margin: 0 auto; }
+  .share-reassure { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.6rem; margin-bottom: 2.4rem; }
+  .share-reassure-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.83rem; color: var(--warm-gray); }
+  .share-reassure-item svg { width: 16px; height: 16px; color: var(--terracotta); flex-shrink: 0; }
+
+  .share-form-card {
+    background: var(--white); border-radius: 22px; padding: 2.6rem 2.4rem;
+    border: 1px solid rgba(44,36,22,0.06); box-shadow: 0 18px 55px rgba(44,36,22,0.07);
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; }
+  .form-field { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.3rem; }
+  .form-label { font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 500; color: var(--charcoal); }
+  .form-label .optional-tag { color: var(--warm-gray); font-weight: 400; font-size: 0.78rem; }
+  .form-input, .form-textarea {
+    width: 100%; padding: 0.85rem 1.05rem; border-radius: 12px;
+    border: 1.5px solid rgba(44,36,22,0.13); background: var(--cream);
+    font-family: 'DM Sans', sans-serif; font-size: 0.95rem; color: var(--charcoal);
+    transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+  }
+  .form-input::placeholder, .form-textarea::placeholder { color: var(--warm-gray); }
+  .form-input:focus, .form-textarea:focus {
+    outline: none; border-color: var(--terracotta); background: var(--white);
+    box-shadow: 0 0 0 3px rgba(196,96,58,0.12);
+  }
+  .form-textarea { min-height: 170px; line-height: 1.7; resize: vertical; }
+  .form-honeypot { position: absolute; left: -9999px; top: -9999px; width: 1px; height: 1px; overflow: hidden; opacity: 0; }
+  .form-checkbox-row { display: flex; align-items: flex-start; gap: 0.65rem; margin-bottom: 1.7rem; }
+  .form-checkbox-row input[type="checkbox"] { margin-top: 0.2rem; width: 17px; height: 17px; accent-color: var(--terracotta); cursor: pointer; flex-shrink: 0; }
+  .form-checkbox-row label { font-size: 0.85rem; color: var(--charcoal-soft); line-height: 1.55; cursor: pointer; }
+  .form-submit-btn { width: 100%; justify-content: center; font-size: 1rem; padding: 1rem 1.5rem; }
+  .form-submit-btn[disabled] { opacity: 0.65; cursor: not-allowed; transform: none !important; box-shadow: 0 4px 20px rgba(196,96,58,0.3) !important; }
+  .form-status {
+    display: none; margin-top: 1.1rem; padding: 0.85rem 1.05rem; border-radius: 12px;
+    font-size: 0.87rem; line-height: 1.6;
+  }
+  .form-status.visible { display: block; }
+  .form-status.success { background: var(--sage-pale); color: #3F5E47; border: 1px solid rgba(122,158,135,0.35); }
+  .form-status.error { background: rgba(196,96,58,0.08); color: var(--terracotta); border: 1px solid rgba(196,96,58,0.25); }
+
   /* ══════════ TALK ══════════ */
   .talk-hero {
     min-height: 100vh; display: flex; align-items: center; justify-content: center;
@@ -1273,6 +1330,13 @@ body{
       padding: 6rem 5% 3rem;
       align-items: flex-start;
     }
+
+    /* Share Your Experience section */
+    .share-hero { padding: 6.5rem 5% 0.5rem; }
+    .share-form-section { padding: 1.6rem 5% 3.5rem; }
+    .share-form-card { padding: 1.8rem 1.4rem; border-radius: 18px; }
+    .share-reassure { gap: 0.9rem 1.2rem; margin-bottom: 1.8rem; }
+    .form-row { grid-template-columns: 1fr; gap: 0; }
 
     /* Layout fixes */
     .wwd-cards { grid-template-columns: 1fr; }
