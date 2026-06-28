@@ -747,25 +747,50 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-// function openTawk() {
-//   if (window.Tawk_API && typeof Tawk_API.toggle === 'function') {
-//     Tawk_API.toggle();
-//   } else {
-//     window.open('https://tawk.to/chat/58b7d7955b8fe5150ee9ed59/default', '_blank', 'noopener');
-//   }
-// }
+/* ══════════ TAWK.TO LIVE CHAT (embedded, in-page) ══════════ */
+// The chat now opens directly on the page in a small chat window (with a
+// built-in pop-out/expand button) instead of navigating to a tawk.to page.
+//
+// We load tawk's official embed widget but hide its default floating bubble,
+// because this site uses its own "Talk to Us" buttons + floating button as the
+// launcher. Clicking any of those calls openTawk(), which opens the chat inline.
+var Tawk_API = Tawk_API || {};
+var Tawk_LoadStart = new Date();
 
-// var Tawk_API = Tawk_API || {};
-// var Tawk_LoadStart = new Date();
-// (function(){
-//   var s1 = document.createElement("script");
-//   var s0 = document.getElementsByTagName("script")[0];
-//   s1.async = true;
-//   s1.src = 'https://embed.tawk.to/58b7d7955b8fe5150ee9ed59/default';
-//   s1.charset = 'UTF-8';
-//   s1.setAttribute('crossorigin', '*');
-//   s0.parentNode.insertBefore(s1, s0);
-//   Tawk_API.onLoad = function() {
-//     Tawk_API.hideWidget();
-//   };
-// })();
+// Hide tawk's own bubble on load — our buttons are the launchers.
+Tawk_API.onLoad = function () {
+  if (typeof Tawk_API.hideWidget === 'function') Tawk_API.hideWidget();
+};
+// When the visitor minimizes or closes the chat, tuck tawk's bubble away again
+// so it never lingers on top of the site's own UI (e.g. the mobile bottom nav).
+Tawk_API.onChatMinimized = function () {
+  if (typeof Tawk_API.hideWidget === 'function') Tawk_API.hideWidget();
+};
+Tawk_API.onChatHidden = function () {
+  if (typeof Tawk_API.hideWidget === 'function') Tawk_API.hideWidget();
+};
+
+(function () {
+  var s1 = document.createElement("script");
+  var s0 = document.getElementsByTagName("script")[0];
+  s1.async = true;
+  s1.src = 'https://embed.tawk.to/58b7d7955b8fe5150ee9ed59/default';
+  s1.charset = 'UTF-8';
+  s1.setAttribute('crossorigin', '*');
+  s0.parentNode.insertBefore(s1, s0);
+})();
+
+// Open the chat in-page. Falls back to the hosted chat page only if the widget
+// hasn't finished loading yet (rare — the embed loads asynchronously).
+function openTawk() {
+  if (window.Tawk_API && typeof Tawk_API.maximize === 'function') {
+    try {
+      if (typeof Tawk_API.showWidget === 'function') Tawk_API.showWidget();
+      Tawk_API.maximize();
+      return;
+    } catch (e) {
+      // fall through to the fallback below
+    }
+  }
+  window.open('https://tawk.to/chat/58b7d7955b8fe5150ee9ed59/default', '_blank', 'noopener');
+}
