@@ -306,6 +306,133 @@ body{
   .bottom-tab.active svg { transform: scale(1.12); }
   .bottom-tab:active { transform: scale(0.92); }
 
+  /* ── MOBILE HAMBURGER TOGGLE ── */
+  .nav-toggle {
+    display: none; /* shown via media query on mobile */
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 44px;
+    height: 44px;
+    padding: 10px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    position: relative;
+    z-index: 510;
+  }
+  .nav-toggle-bar {
+    display: block;
+    width: 100%;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--charcoal);
+    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease;
+  }
+  body.menu-open .nav-toggle-bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  body.menu-open .nav-toggle-bar:nth-child(2) { opacity: 0; }
+  body.menu-open .nav-toggle-bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* ── MOBILE SLIDE-OUT MENU ── */
+  .mobile-menu {
+    position: fixed;
+    inset: 0;
+    z-index: 700;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  .mobile-menu.open {
+    visibility: visible;
+    pointer-events: auto;
+  }
+  .mobile-menu-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(44,36,22,0.45);
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+  .mobile-menu.open .mobile-menu-backdrop { opacity: 1; }
+  .mobile-menu-panel {
+    position: absolute;
+    top: 0; right: 0; bottom: 0;
+    width: min(82%, 340px);
+    background: var(--white);
+    box-shadow: -12px 0 44px rgba(44,36,22,0.2);
+    display: flex;
+    flex-direction: column;
+    padding: 1.4rem 1.4rem calc(1.8rem + env(safe-area-inset-bottom, 0px));
+    transform: translateX(100%);
+    transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+  .mobile-menu.open .mobile-menu-panel { transform: translateX(0); }
+  .mobile-menu-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-bottom: 1.1rem;
+    margin-bottom: 0.7rem;
+    border-bottom: 1px solid rgba(196,96,58,0.12);
+  }
+  .mobile-menu-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.12rem;
+    color: var(--charcoal);
+  }
+  .mobile-menu-title em { font-style: italic; color: var(--terracotta); }
+  .mobile-menu-close {
+    display: flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px;
+    border: none; background: none; color: var(--charcoal-soft);
+    cursor: pointer; border-radius: 50%;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.2s, color 0.2s;
+  }
+  .mobile-menu-close svg { width: 24px; height: 24px; }
+  .mobile-menu-close:active { background: rgba(196,96,58,0.12); color: var(--terracotta); }
+  .mobile-menu-links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
+  }
+  .mobile-menu-links a {
+    display: flex; align-items: center; gap: 0.9rem;
+    padding: 0.95rem 0.8rem;
+    border-radius: 12px;
+    text-decoration: none;
+    color: var(--charcoal-soft);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem; font-weight: 400; letter-spacing: 0.01em;
+    transition: background 0.2s, color 0.2s, transform 0.15s;
+  }
+  .mobile-menu-links a svg { width: 22px; height: 22px; flex-shrink: 0; color: var(--terracotta); transition: color 0.2s; }
+  .mobile-menu-links a:active { transform: scale(0.98); }
+  .mobile-menu-links a.mobile-active {
+    background: rgba(196,96,58,0.1);
+    color: var(--terracotta);
+    font-weight: 500;
+  }
+  .mobile-menu-cta {
+    margin-top: 0.7rem;
+    background: var(--terracotta);
+    color: var(--white) !important;
+    box-shadow: 0 6px 20px rgba(196,96,58,0.28);
+  }
+  .mobile-menu-cta svg { color: var(--white) !important; }
+  .mobile-menu-cta.mobile-active { background: var(--terracotta) !important; color: var(--white) !important; }
+  .mobile-menu-hashtag {
+    display: block;
+    text-align: center;
+    margin-top: 1rem;
+    font-family: 'Caveat', cursive;
+    font-size: 1.35rem;
+    color: var(--terracotta);
+  }
+  body.menu-open { overflow: hidden; }
+
   /* ── SECTIONS ── */
   section {
     display: none;
@@ -1290,6 +1417,11 @@ body{
     /* Hide desktop nav links */
     .nav-links {
       display: none !important;
+    }
+
+    /* Show hamburger toggle */
+    .nav-toggle {
+      display: flex;
     }
 
     /* Float chat button hidden on mobile — bottom nav handles it */

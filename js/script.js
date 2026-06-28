@@ -154,7 +154,63 @@ function updateBottomTabs(id) {
     const navLinks = document.querySelectorAll('.nav-links a:not(.nav-cta)');
     if (navLinks[pageMap[id]]) navLinks[pageMap[id]].classList.add('nav-active');
   }
+
+  // Sync the mobile slide-out menu's active state
+  document.querySelectorAll('.mobile-menu-links a').forEach(a => a.classList.remove('mobile-active'));
+  const mobileLink = document.getElementById('m-' + id);
+  if (mobileLink) mobileLink.classList.add('mobile-active');
 }
+
+/* ══════════ MOBILE SLIDE-OUT MENU ══════════ */
+function openMobileMenu() {
+  const menu = document.getElementById('mobileMenu');
+  const toggle = document.getElementById('navToggle');
+  if (!menu) return;
+  menu.classList.add('open');
+  menu.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('menu-open');
+  if (toggle) {
+    toggle.setAttribute('aria-expanded', 'true');
+    toggle.setAttribute('aria-label', 'Close menu');
+  }
+}
+
+function closeMobileMenu() {
+  const menu = document.getElementById('mobileMenu');
+  const toggle = document.getElementById('navToggle');
+  if (!menu) return;
+  menu.classList.remove('open');
+  menu.setAttribute('aria-hidden', 'true');
+  document.body.classList.remove('menu-open');
+  if (toggle) {
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-label', 'Open menu');
+  }
+}
+
+function toggleMobileMenu() {
+  const menu = document.getElementById('mobileMenu');
+  if (!menu) return;
+  if (menu.classList.contains('open')) {
+    closeMobileMenu();
+  } else {
+    openMobileMenu();
+  }
+}
+
+// Navigate from the mobile menu: switch page, then close the drawer.
+function navigateMobile(id) {
+  closeMobileMenu();
+  showPage(id);
+}
+
+// Close the menu on Escape, or when resizing up to desktop.
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeMobileMenu();
+});
+window.addEventListener('resize', () => {
+  if (window.innerWidth > 700) closeMobileMenu();
+});
 
 /* ── Scroll reveal ── */
 function observeReveal() {
