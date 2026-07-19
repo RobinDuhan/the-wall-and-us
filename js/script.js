@@ -154,63 +154,7 @@ function updateBottomTabs(id) {
     const navLinks = document.querySelectorAll('.nav-links a:not(.nav-cta)');
     if (navLinks[pageMap[id]]) navLinks[pageMap[id]].classList.add('nav-active');
   }
-
-  // Sync the mobile slide-out menu's active state
-  document.querySelectorAll('.mobile-menu-links a').forEach(a => a.classList.remove('mobile-active'));
-  const mobileLink = document.getElementById('m-' + id);
-  if (mobileLink) mobileLink.classList.add('mobile-active');
 }
-
-/* ══════════ MOBILE SLIDE-OUT MENU ══════════ */
-function openMobileMenu() {
-  const menu = document.getElementById('mobileMenu');
-  const toggle = document.getElementById('navToggle');
-  if (!menu) return;
-  menu.classList.add('open');
-  menu.setAttribute('aria-hidden', 'false');
-  document.body.classList.add('menu-open');
-  if (toggle) {
-    toggle.setAttribute('aria-expanded', 'true');
-    toggle.setAttribute('aria-label', 'Close menu');
-  }
-}
-
-function closeMobileMenu() {
-  const menu = document.getElementById('mobileMenu');
-  const toggle = document.getElementById('navToggle');
-  if (!menu) return;
-  menu.classList.remove('open');
-  menu.setAttribute('aria-hidden', 'true');
-  document.body.classList.remove('menu-open');
-  if (toggle) {
-    toggle.setAttribute('aria-expanded', 'false');
-    toggle.setAttribute('aria-label', 'Open menu');
-  }
-}
-
-function toggleMobileMenu() {
-  const menu = document.getElementById('mobileMenu');
-  if (!menu) return;
-  if (menu.classList.contains('open')) {
-    closeMobileMenu();
-  } else {
-    openMobileMenu();
-  }
-}
-
-// Navigate from the mobile menu: switch page, then close the drawer.
-function navigateMobile(id) {
-  closeMobileMenu();
-  showPage(id);
-}
-
-// Close the menu on Escape, or when resizing up to desktop.
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeMobileMenu();
-});
-window.addEventListener('resize', () => {
-  if (window.innerWidth > 700) closeMobileMenu();
-});
 
 /* ── Scroll reveal ── */
 function observeReveal() {
@@ -221,6 +165,46 @@ function observeReveal() {
     entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
   }, { threshold: 0.1 });
   els.forEach(el => { el.classList.remove('visible'); obs.observe(el); });
+}
+
+/* ── Homepage chat counter ── */
+function initChatCounter() {
+  const count = document.getElementById('chatCount');
+  if (!count || count.dataset.initialized) return;
+  count.dataset.initialized = 'true';
+
+  const milestones = [4200, 9800, 16400, 22100, 27000];
+  const format = new Intl.NumberFormat('en-US');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function animate() {
+    if (reduceMotion) {
+      count.textContent = format.format(milestones[milestones.length - 1]);
+      return;
+    }
+
+    const duration = 1850;
+    const start = performance.now();
+    function frame(now) {
+      const progress = Math.min((now - start) / duration, 1);
+      const index = Math.min(Math.floor(progress * milestones.length), milestones.length - 1);
+      const previous = index ? milestones[index - 1] : 0;
+      const target = milestones[index];
+      const segmentProgress = Math.min((progress * milestones.length) - index, 1);
+      const eased = 1 - Math.pow(1 - segmentProgress, 3);
+      count.textContent = format.format(Math.round(previous + ((target - previous) * eased)));
+      if (progress < 1) requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  const observer = new IntersectionObserver(entries => {
+    if (entries.some(entry => entry.isIntersecting)) {
+      animate();
+      observer.disconnect();
+    }
+  }, { threshold: 0.55 });
+  observer.observe(count.closest('.chat-counter'));
 }
 
 /* ── Hero wall brick stagger ── */
@@ -742,6 +726,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initHeroParallax();
   initCtaParticles();
   initShareForm();
+  initChatCounter();
   observeReveal();
 });
 
