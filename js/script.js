@@ -775,8 +775,7 @@ function openTawk() {
 }
 
 function openHostedTawk() {
-  var popup = window.open(TAWK_CHAT_URL, '_blank', 'noopener');
-  if (!popup) window.location.href = TAWK_CHAT_URL;
+  window.open(TAWK_CHAT_URL, '_blank', 'noopener');
 }
 
 Tawk_API.onUnreadCountChanged = function (count) {
