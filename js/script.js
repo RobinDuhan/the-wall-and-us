@@ -72,38 +72,15 @@ window.addEventListener('scroll', () => {
   document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 30);
 });
 
-/* ── Floating chat dark-bg detection ── */
-const darkSections = document.querySelectorAll('.cta-banner, .about-hero, .blog-banner');
-const wallBg = document.querySelector('.hero-wall-bg');
-const floatChat = document.getElementById('floatChat');
-
-function updateFloatChatColor() {
-  if (!floatChat) return;
-  const onDark = [...darkSections].some(s => {
-    const r = s.getBoundingClientRect();
-    return r.bottom > window.innerHeight * 0.5 && r.top < window.innerHeight * 0.85;
-  });
-  let onWall = false;
-  if (wallBg && document.getElementById('home').classList.contains('active')) {
-    const wRect = wallBg.getBoundingClientRect();
-    const fRect = floatChat.getBoundingClientRect();
-    onWall = !(fRect.right < wRect.left || fRect.left > wRect.right ||
-              fRect.bottom < wRect.top  || fRect.top  > wRect.bottom);
-  }
-  floatChat.classList.toggle('on-dark', onDark || onWall);
-}
-
-if (floatChat) {
-  const obs = new IntersectionObserver(updateFloatChatColor, { threshold: 0.2 });
-  darkSections.forEach(s => obs.observe(s));
-  if (wallBg) obs.observe(wallBg);
-  window.addEventListener('scroll', updateFloatChatColor, { passive: true });
-}
-
 /* ══════════ PAGE NAVIGATION ══════════ */
 let pageTransitionTimer = null;
 
 function showPage(id) {
+  if (id === 'talk') {
+    openTawk();
+    return;
+  }
+
   const current = document.querySelector('section.active');
   const target = document.getElementById(id);
   updateBottomTabs(id);
@@ -134,7 +111,6 @@ function showPage(id) {
     
     // Re-trigger layout engine items for newly exposed sections
     initCardTilt();
-    updateFloatChatColor();
   }, current ? 150 : 0);
 }
 
@@ -732,25 +708,110 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-// function openTawk() {
-//   if (window.Tawk_API && typeof Tawk_API.toggle === 'function') {
-//     Tawk_API.toggle();
-//   } else {
-//     window.open('https://tawk.to/chat/58b7d7955b8fe5150ee9ed59/default', '_blank', 'noopener');
-//   }
-// }
+/* ══════════ TAWK.TO LIVE CHAT ══════════ */
+var Tawk_API = window.Tawk_API || {};
+var Tawk_LoadStart = new Date();
 
-// var Tawk_API = Tawk_API || {};
-// var Tawk_LoadStart = new Date();
-// (function(){
-//   var s1 = document.createElement("script");
-//   var s0 = document.getElementsByTagName("script")[0];
-//   s1.async = true;
-//   s1.src = 'https://embed.tawk.to/58b7d7955b8fe5150ee9ed59/default';
-//   s1.charset = 'UTF-8';
-//   s1.setAttribute('crossorigin', '*');
-//   s0.parentNode.insertBefore(s1, s0);
-//   Tawk_API.onLoad = function() {
-//     Tawk_API.hideWidget();
-//   };
-// })();
+var TAWK_EMBED_URL = 'https://embed.tawk.to/58b7d7955b8fe5150ee9ed59/default';
+var tawkLoaded = false;
+var tawkReady = false;
+var tawkWantsMaximize = false;
+var chatUnread = 0;
+var chatBaseTitle = document.title;
+
+function paintChatUnread() {
+  var tabTalk = document.getElementById('tab-talk');
+  if (tabTalk) {
+    tabTalk.classList.toggle('has-unread', chatUnread > 0);
+    tabTalk.setAttribute('data-unread', chatUnread > 9 ? '9+' : String(chatUnread));
+  }
+  document.title = chatUnread > 0 ? '(' + chatUnread + ') ' + chatBaseTitle : chatBaseTitle;
+}
+
+function setChatUnread(n) {
+  n = Math.max(0, n | 0);
+  if (n === chatUnread) return;
+  chatUnread = n;
+  paintChatUnread();
+}
+
+function clearChatUnread() {
+  setChatUnread(0);
+}
+
+function syncTawkWidgetVisibility() {
+  if (!window.Tawk_API) return;
+  if (window.matchMedia('(max-width: 700px)').matches) {
+    if (typeof Tawk_API.hideWidget === 'function') Tawk_API.hideWidget();
+    return;
+  }
+  if (typeof Tawk_API.showWidget === 'function') Tawk_API.showWidget();
+}
+
+function loadTawk() {
+  if (tawkLoaded) return;
+  tawkLoaded = true;
+
+  var s1 = document.createElement('script');
+  var s0 = document.getElementsByTagName('script')[0];
+  s1.async = true;
+  s1.src = TAWK_EMBED_URL;
+  s1.charset = 'UTF-8';
+  s1.setAttribute('crossorigin', '*');
+  s0.parentNode.insertBefore(s1, s0);
+}
+
+function openTawk() {
+  clearChatUnread();
+  loadTawk();
+
+  if (tawkReady && window.Tawk_API && typeof Tawk_API.maximize === 'function') {
+    try {
+      if (typeof Tawk_API.showWidget === 'function') Tawk_API.showWidget();
+      Tawk_API.maximize();
+      return;
+    } catch (e) {
+      // Let onLoad retry if the widget is still starting up.
+    }
+  }
+
+  tawkWantsMaximize = true;
+}
+
+Tawk_API.onUnreadCountChanged = function (count) {
+  setChatUnread(typeof count === 'number' ? count : parseInt(count, 10) || 0);
+};
+
+Tawk_API.onChatMessageAgent = function () {
+  var maximized = typeof Tawk_API.isChatMaximized === 'function' && Tawk_API.isChatMaximized();
+  if (!maximized) setChatUnread(chatUnread + 1);
+};
+
+Tawk_API.onLoad = function () {
+  tawkReady = true;
+  syncTawkWidgetVisibility();
+
+  if (tawkWantsMaximize) {
+    tawkWantsMaximize = false;
+    if (typeof Tawk_API.showWidget === 'function') Tawk_API.showWidget();
+    if (typeof Tawk_API.maximize === 'function') Tawk_API.maximize();
+  }
+};
+
+Tawk_API.onChatMaximized = function () {
+  clearChatUnread();
+};
+
+Tawk_API.onChatMinimized = function () {
+  syncTawkWidgetVisibility();
+};
+
+Tawk_API.onChatHidden = function () {
+  syncTawkWidgetVisibility();
+};
+
+window.addEventListener('resize', function () {
+  if (tawkReady) syncTawkWidgetVisibility();
+});
+
+window.addEventListener('load', loadTawk);

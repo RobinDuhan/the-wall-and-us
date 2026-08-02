@@ -305,6 +305,15 @@ body{
   .bottom-tab.active { color: var(--terracotta); }
   .bottom-tab.active svg { transform: scale(1.12); }
   .bottom-tab:active { transform: scale(0.92); }
+  .bottom-tab.has-unread::after {
+    content: attr(data-unread);
+    position: absolute; top: -4px; right: -4px;
+    min-width: 18px; height: 18px; padding: 0 4px;
+    display: flex; align-items: center; justify-content: center;
+    background: #D64545; color: #fff; border-radius: 100px;
+    font-size: 0.65rem; font-weight: 500; line-height: 1;
+    box-shadow: 0 0 0 2px var(--white);
+  }
 
   /* ── SECTIONS ── */
   section {
@@ -1301,23 +1310,6 @@ body{
   .footer-social-btn:hover { background: rgba(196,96,58,0.2); color: var(--terracotta-light); border-color: rgba(196,96,58,0.3); }
   .footer-divider { height: 1px; background: rgba(253,250,245,0.07); margin: 0 0 1.2rem; }
 
-  /* ── FLOATING CHAT BUTTON ── */
-  .float-chat {
-    position: fixed; bottom: 1.8rem; right: 1.8rem;
-    background: var(--terracotta); color: var(--white);
-    border: none; border-radius: 100px; padding: 0.8rem 1.5rem;
-    font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 0.87rem;
-    cursor: pointer; z-index: 400; display: flex; align-items: center; gap: 0.5rem;
-    box-shadow: 0 4px 28px rgba(196,96,58,0.38); transition: all 0.3s;
-    animation: floatBtn 4s ease-in-out infinite;
-    text-decoration: none;
-  }
-  .float-chat.on-dark { background: var(--white); color: var(--charcoal); box-shadow: 0 4px 28px rgba(0,0,0,0.25); }
-  .float-chat.on-dark:hover { background: var(--cream); }
-  .float-chat:hover { background: var(--charcoal); transform: translateY(-2px); }
-  @keyframes floatBtn { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-  .float-chat svg { width: 18px; height: 18px; }
-
   /* ══════════ RESPONSIVE ══════════ */
   @media (max-width: 900px) {
     .wwd-grid, .about-story-grid { grid-template-columns: 1fr; gap: 3rem; }
@@ -1343,9 +1335,9 @@ body{
       display: none !important;
     }
 
-    /* Float chat button hidden on mobile — bottom nav handles it */
-    .float-chat {
-      display: none !important;
+    /* Show hamburger toggle */
+    .nav-toggle {
+      display: flex;
     }
 
     /*
