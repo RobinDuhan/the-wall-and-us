@@ -775,7 +775,7 @@ function openTawk() {
 }
 
 function openHostedTawk() {
-  var popup = window.open(TAWK_CHAT_URL, 'twau_chat', 'width=420,height=680');
+  var popup = window.open(TAWK_CHAT_URL, '_blank', 'noopener');
   if (!popup) window.location.href = TAWK_CHAT_URL;
 }
 
