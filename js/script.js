@@ -76,11 +76,6 @@ window.addEventListener('scroll', () => {
 let pageTransitionTimer = null;
 
 function showPage(id) {
-  if (id === 'talk') {
-    openTawk();
-    return;
-  }
-
   const current = document.querySelector('section.active');
   const target = document.getElementById(id);
   updateBottomTabs(id);
@@ -712,6 +707,7 @@ document.addEventListener("DOMContentLoaded", () => {
 var Tawk_API = window.Tawk_API || {};
 var Tawk_LoadStart = new Date();
 
+var TAWK_CHAT_URL = 'https://tawk.to/chat/58b7d7955b8fe5150ee9ed59/default';
 var TAWK_EMBED_URL = 'https://embed.tawk.to/58b7d7955b8fe5150ee9ed59/default';
 var tawkLoaded = false;
 var tawkReady = false;
@@ -776,6 +772,11 @@ function openTawk() {
   }
 
   tawkWantsMaximize = true;
+}
+
+function openHostedTawk() {
+  var popup = window.open(TAWK_CHAT_URL, 'twau_chat', 'width=420,height=680');
+  if (!popup) window.location.href = TAWK_CHAT_URL;
 }
 
 Tawk_API.onUnreadCountChanged = function (count) {
