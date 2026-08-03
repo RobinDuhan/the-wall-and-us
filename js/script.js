@@ -735,9 +735,13 @@ function clearChatUnread() {
   setChatUnread(0);
 }
 
+function isMobileTawkDisabled() {
+  return window.matchMedia('(max-width: 700px)').matches;
+}
+
 function syncTawkWidgetVisibility() {
   if (!window.Tawk_API) return;
-  if (window.matchMedia('(max-width: 700px)').matches) {
+  if (isMobileTawkDisabled()) {
     if (typeof Tawk_API.hideWidget === 'function') Tawk_API.hideWidget();
     return;
   }
@@ -745,7 +749,7 @@ function syncTawkWidgetVisibility() {
 }
 
 function loadTawk() {
-  if (tawkLoaded) return;
+  if (tawkLoaded || isMobileTawkDisabled()) return;
   tawkLoaded = true;
 
   var s1 = document.createElement('script');
@@ -758,6 +762,11 @@ function loadTawk() {
 }
 
 function openTawk() {
+  if (isMobileTawkDisabled()) {
+    openHostedTawk();
+    return;
+  }
+
   clearChatUnread();
   loadTawk();
 
