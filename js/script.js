@@ -76,6 +76,11 @@ window.addEventListener('scroll', () => {
 let pageTransitionTimer = null;
 
 function showPage(id) {
+  if (id === 'talk') {
+    openTawk();
+    return;
+  }
+
   const current = document.querySelector('section.active');
   const target = document.getElementById(id);
   updateBottomTabs(id);
@@ -761,6 +766,24 @@ function loadTawk() {
   s0.parentNode.insertBefore(s1, s0);
 }
 
+function maximizeTawk(attemptsLeft) {
+  if (!window.Tawk_API || typeof Tawk_API.maximize !== 'function') return;
+
+  try {
+    if (typeof Tawk_API.showWidget === 'function') Tawk_API.showWidget();
+    Tawk_API.maximize();
+  } catch (e) {
+    // Keep retrying below while the widget finishes attaching itself.
+  }
+
+  if (attemptsLeft > 0) {
+    setTimeout(function () {
+      var isOpen = typeof Tawk_API.isChatMaximized === 'function' && Tawk_API.isChatMaximized();
+      if (!isOpen) maximizeTawk(attemptsLeft - 1);
+    }, 150);
+  }
+}
+
 function openTawk() {
   if (isMobileTawkDisabled()) {
     openHostedTawk();
@@ -770,14 +793,9 @@ function openTawk() {
   clearChatUnread();
   loadTawk();
 
-  if (tawkReady && window.Tawk_API && typeof Tawk_API.maximize === 'function') {
-    try {
-      if (typeof Tawk_API.showWidget === 'function') Tawk_API.showWidget();
-      Tawk_API.maximize();
-      return;
-    } catch (e) {
-      // Let onLoad retry if the widget is still starting up.
-    }
+  if (tawkReady) {
+    maximizeTawk(6);
+    return;
   }
 
   tawkWantsMaximize = true;
@@ -802,8 +820,7 @@ Tawk_API.onLoad = function () {
 
   if (tawkWantsMaximize) {
     tawkWantsMaximize = false;
-    if (typeof Tawk_API.showWidget === 'function') Tawk_API.showWidget();
-    if (typeof Tawk_API.maximize === 'function') Tawk_API.maximize();
+    maximizeTawk(8);
   }
 };
 
